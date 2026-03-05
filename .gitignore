@@ -1,0 +1,23 @@
+# Dependencies
+native/node_modules/
+
+# Pipeline outputs
+deliverables/
+audit-logs/
+workspace/
+
+# Temp files
+*.py
+build_report.py
+FINAL_VERIFICATION.txt
+REPORT_MODIFICATION_SUMMARY.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo

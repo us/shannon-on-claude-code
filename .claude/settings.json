@@ -1,0 +1,48 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nmap *)",
+      "Bash(subfinder *)",
+      "Bash(whatweb *)",
+      "Bash(mkdir *)",
+      "Bash(cat *)",
+      "Bash(curl *)",
+      "Bash(sqlmap *)",
+      "Bash(python3 *)",
+      "Bash(node *)",
+      "Bash(npx *)",
+      "Bash(cp *)",
+      "Bash(ls *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(echo *)",
+      "Bash(jq *)",
+      "Bash(date *)",
+      "Bash(oathtool *)",
+      "Read",
+      "Write",
+      "Edit",
+      "Glob",
+      "Grep",
+      "Agent",
+      "mcp__playwright__*",
+      "mcp__shannon-tools__*"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/audit-logger.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

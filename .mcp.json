@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--headless"]
+    },
+    "shannon-tools": {
+      "command": "node",
+      "args": ["/home/us/shannon-claude/native/mcp-stdio-wrapper.mjs"],
+      "env": {
+        "SHANNON_TARGET_DIR": "."
+      }
+    }
+  }
+}
