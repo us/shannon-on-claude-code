@@ -2,7 +2,7 @@
 name: recon
 description: Attack surface mapping and reconnaissance. Requires pre-recon deliverable.
 tools: Read, Grep, Glob, Write, Edit, Bash, Agent, mcp__playwright__*, mcp__shannon-tools__*
-model: sonnet
+model: claude-sonnet-4-6
 maxTurns: 500
 ---
 

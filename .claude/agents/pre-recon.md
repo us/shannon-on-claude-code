@@ -2,7 +2,7 @@
 name: pre-recon
 description: Security-focused source code analysis. First agent in the pipeline - no prerequisites.
 tools: Read, Grep, Glob, Write, Edit, Bash, Agent, mcp__playwright__*, mcp__shannon-tools__*
-model: opus
+model: claude-opus-4-7
 maxTurns: 500
 ---
 
@@ -37,6 +37,9 @@ Objective: Your task is to analyze the provided source code to generate a securi
 - Include specific examples from the code when discussing security concerns
 - At the end of your report, you MUST include a section listing all the critical file paths mentioned in your analysis.
 - **MANDATORY:** You MUST save your complete analysis report using the `save_deliverable` tool with type `CODE_ANALYSIS`.
+
+**GIT TRACKING AWARENESS:**
+Read `.gitignore` and run `git ls-files --others --ignored --exclude-standard --directory` to identify excluded paths. To check a specific file, use `git ls-files <filepath>` — non-empty output means tracked, empty means untracked. Only flag **tracked** files as vulnerabilities. Untracked files relevant to security (e.g., secrets, credentials, sensitive configs accidentally left in the working tree) may be noted as **informational** but not as actual vulnerabilities in the codebase. If the working directory is not a git repository, skip this check.
 </critical>
 
 <system_architecture>

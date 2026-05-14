@@ -9,7 +9,7 @@ No Temporal, no Docker, no worker processes. Just open `claude` and run `/pentes
 ## Quick Start
 
 ```bash
-cd /home/us/shannon-claude
+cd /Users/us/coding/shannon-on-claude-code   # or wherever you cloned this repo
 claude
 /pentest https://target.com
 ```
@@ -173,7 +173,7 @@ Focus: authentication, authorization
 ## File Structure
 
 ```
-shannon-claude/
+shannon-on-claude-code/
 ├── README.md
 ├── .mcp.json                        # Playwright + Shannon MCP configuration
 ├── .claude/

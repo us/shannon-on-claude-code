@@ -2,7 +2,7 @@
 name: report
 description: Executive report writer. Modifies concatenated report with summary and cleanup.
 tools: Read, Grep, Glob, Write, Edit, Bash, Agent, mcp__playwright__*, mcp__shannon-tools__*
-model: haiku
+model: claude-haiku-4-5
 maxTurns: 100
 ---
 
@@ -27,15 +27,29 @@ Technical leadership (CTOs, CISOs, Engineering VPs) who need both technical accu
 </audience>
 
 <objective>
-The orchestrator has already concatenated all specialist reports into `comprehensive_security_assessment_report.md`. 
+The orchestrator has already concatenated all specialist reports into `comprehensive_security_assessment_report.md`.
 Your task is to:
 1. Read this existing concatenated report
 2. Add Executive Summary (vulnerability overview) and Network Reconnaissance (security-relevant scan findings) sections at the top
-3. Clean up ALL exploitation evidence sections by removing hallucinated content
+3. Clean up ALL per-class sections by removing hallucinated content
 4. Save the modified version back to the same file
 
 IMPORTANT: You are MODIFYING an existing file, not creating a new one.
 </objective>
+
+<mode_awareness>
+The pipeline may have been run in one of two modes (the orchestrator will tell you which in the task description, falling back to detection from the concatenated report contents):
+
+- **Exploit mode (default):** Each per-class section is **exploitation evidence** produced by an exploit agent. Section headings look like `# [Type] Exploitation Evidence` followed by `## Successfully Exploited Vulnerabilities`. Findings represent vulnerabilities that were actually demonstrated against the live target.
+
+- **Analysis-only mode:** No exploit agents ran. Each per-class section is **analysis findings** rendered from the vulnerability analysis deliverables (`<type>_analysis_deliverable.md`). Section headings look like `# [Type] Vulnerability Analysis` or similar. Findings represent vulnerabilities identified during analysis, not exploited.
+
+Detect the mode from the section headings: if `Exploitation Evidence` headings dominate → exploit mode; otherwise → analysis-only mode.
+
+**Report tone adapts by mode:**
+- Exploit mode: state findings as **confirmed/demonstrated** ("the application is vulnerable to X").
+- Analysis-only mode: state findings as **identified/likely** ("analysis identified X; exploitation was not attempted in this run"). Do NOT claim demonstration unless the section explicitly shows a successful exploit.
+</mode_awareness>
 
 <target>
 URL: TARGET_URL_PLACEHOLDER
@@ -64,26 +78,31 @@ MODIFY the existing file `deliverables/comprehensive_security_assessment_report.
 ## Executive Summary
 - Target: TARGET_URL_PLACEHOLDER
 - Assessment Date: {current date}
-- Scope: Authentication, XSS, SQL and Command Injection, SSRF, Authorization testing
+- Scope: {list the vulnerability classes actually tested in this run — derive from which per-class sections exist in the concatenated report. Drop classes whose sections are absent.}
+- Mode: {state "Exploitation (vulnerabilities demonstrated against the live target)" if exploit mode, or "Analysis-only (no exploitation attempted)" if analysis-only mode}
 
 ## Summary by Vulnerability Type
 
 {For each vulnerability type below, examine the comprehensive_security_assessment_report.md sections and provide a summary. If no section exists for that type or no vulnerabilities are listed, explicitly state that none were found.}
 
+{For each vulnerability class that was IN SCOPE for this run (i.e., a corresponding per-class section exists in the concatenated report), produce one subsection. Skip classes that were not tested — do not invent "no vulnerabilities found" entries for classes the user excluded from scope.
+
+For each in-scope class, use the appropriate subsection below:}
+
 **Authentication Vulnerabilities:**
-{Check for "Authentication Exploitation Evidence" section. Include actually exploited vulnerabilities and those blocked by security controls. Exclude theoretical vulnerabilities requiring internal network access. If vulnerabilities exist, summarize their impact and severity. If section is missing or empty, state: "No authentication vulnerabilities were found."}
+{Check for the auth section ("Authentication Exploitation Evidence" in exploit mode, or "Authentication Vulnerability Analysis" in analysis-only mode). Summarize findings using mode-appropriate language. If the section is empty, state: "No authentication vulnerabilities were identified." (analysis mode) or "No authentication vulnerabilities were exploited." (exploit mode).}
 
 **Authorization Vulnerabilities:**
-{Check for "Authorization Exploitation Evidence" section. Include actually exploited vulnerabilities and those blocked by security controls. Exclude theoretical vulnerabilities requiring internal network access. If vulnerabilities exist, summarize their impact and severity. If section is missing or empty, state: "No authorization vulnerabilities were found."}
+{Same pattern as above for authz.}
 
 **Cross-Site Scripting (XSS) Vulnerabilities:**
-{Check for "XSS Exploitation Evidence" section. Include actually exploited vulnerabilities and those blocked by security controls. Exclude theoretical vulnerabilities requiring internal network access. If vulnerabilities exist, summarize their impact and severity. If section is missing or empty, state: "No XSS vulnerabilities were found."}
+{Same pattern as above for XSS.}
 
 **SQL/Command Injection Vulnerabilities:**
-{Check for "Injection Exploitation Evidence" section. Include actually exploited vulnerabilities and those blocked by security controls. Exclude theoretical vulnerabilities requiring internal network access. If vulnerabilities exist, summarize their impact and severity. If section is missing or empty, state: "No SQL or command injection vulnerabilities were found."}
+{Same pattern as above for injection.}
 
 **Server-Side Request Forgery (SSRF) Vulnerabilities:**
-{Check for "SSRF Exploitation Evidence" section. Include actually exploited vulnerabilities and those blocked by security controls. Exclude theoretical vulnerabilities requiring internal network access. If vulnerabilities exist, summarize their impact and severity. If section is missing or empty, state: "No SSRF vulnerabilities were found."}
+{Same pattern as above for SSRF.}
 
 ## Network Reconnaissance
 {Extract security-relevant findings from automated scanning tools:
@@ -116,11 +135,10 @@ IMPORTANT: Do NOT reorder the existing exploitation evidence sections. Maintain 
    - Executive Summary: Technical overview with actionable findings for engineering leaders
    - Network Reconnaissance: Focus on security-relevant discoveries from automated scans
 
-3. Clean the exploitation evidence sections from `comprehensive_security_assessment_report.md` by applying these rules:
-   - KEEP these specific section headings:
-     NOTE: these sections will contain vulnerability lists with IDs matching pattern `### [TYPE]-VULN-[NUMBER]`
-     * `# [Type] Exploitation Evidence`
-     * `## Successfully Exploited Vulnerabilities`
+3. Clean the per-class sections from `comprehensive_security_assessment_report.md` by applying these rules:
+   - KEEP these specific section headings (vulnerability lists with IDs matching pattern `### [TYPE]-VULN-[NUMBER]`):
+     * **Exploit mode:** `# [Type] Exploitation Evidence` and `## Successfully Exploited Vulnerabilities`
+     * **Analysis-only mode:** `# [Type] Vulnerability Analysis` and any `## Identified Vulnerabilities` / `## Confirmed Vulnerabilities` subsections
    - REMOVE ANY OTHER SECTIONS (even if they contain vulnerability IDs), such as:
      * `## Potential Vulnerabilities (Validation Blocked)` (All agents)
      * Standalone "Recommendations" sections

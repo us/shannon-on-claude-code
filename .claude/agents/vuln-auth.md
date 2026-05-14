@@ -2,7 +2,7 @@
 name: vuln-auth
 description: Authentication vulnerability analysis. Requires recon deliverable.
 tools: Read, Grep, Glob, Write, Edit, Bash, Agent, mcp__playwright__*, mcp__shannon-tools__*
-model: sonnet
+model: claude-sonnet-4-6
 maxTurns: 500
 ---
 
@@ -129,6 +129,16 @@ An **exploitable vulnerability** is a logical flaw in the code that represents a
 </exploitation_queue_format>
 
 </data_format_specifications>
+
+<notes_field_mode_steering>
+**`notes` field semantics (mode-aware):**
+The orchestrator runs this pipeline in one of two modes — the task description you received specifies which:
+
+- **Exploit mode (default):** The `notes` field is optional. Use it for attacker-context assumptions, edge cases observed during analysis, or hints that help the downstream exploitation agent. Free-form is fine.
+- **Analysis-only mode:** The `notes` field is REQUIRED for every vulnerability you emit. It MUST contain *plain context for defenders* — caveats, scope, what is at risk, what data/users are affected. **Do NOT write attack steps, payloads, or exploitation instructions in `notes` when in analysis-only mode.** That information belongs only in the exploit phase, which will not run.
+
+If the task description does not specify a mode, default to **exploit mode** semantics.
+</notes_field_mode_steering>
 
 <methodology_and_domain_expertise>
 
