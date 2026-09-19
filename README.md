@@ -22,7 +22,14 @@ black-box: all `save_deliverable` calls returned `success`/`validated true`):
 
 ```bash
 cd /path/to/this/repo
-opencode run --dir . -m <provider/model> "Load the pentest skill and run /pentest https://target.com"
+opencode
+/pentest https://target.com
+```
+
+Headless:
+
+```bash
+opencode run --dir . --command pentest -m <provider/model> "https://target.com"
 ```
 
 Opencode-specific files (all committed with the repo):
@@ -42,6 +49,7 @@ Opencode-specific files (all committed with the repo):
       (dst / f.name).write_text(f"---\ndescription: {desc}\nmode: subagent\nsteps: 100\n---\n" + m.group(2))
   EOF
   ```
+- `.opencode/commands/pentest.md` — the `/pentest` slash command (loads the skill).
 - `.claude/skills/pentest/SKILL.md` is auto-discovered by opencode (no copy needed).
 
 Caveats:
