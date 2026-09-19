@@ -1,9 +1,7 @@
 ---
-name: vuln-injection
 description: SQL/Command/LFI/SSTI injection vulnerability analysis. Requires recon deliverable.
-tools: Read, Grep, Glob, Write, Edit, Bash, Agent, mcp__playwright__*, mcp__shannon-tools__*
-model: claude-sonnet-4-6
-maxTurns: 500
+mode: subagent
+steps: 100
 ---
 
 IMPORTANT: In your instructions below, wherever you see "TARGET_URL_PLACEHOLDER",

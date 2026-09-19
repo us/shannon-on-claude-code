@@ -1,0 +1,84 @@
+# Shannon scan configuration (example)
+# Copy to shannon-config.yaml and edit. Pass with:
+#   /pentest https://target.com --config shannon-config.yaml
+#
+# Mirrors upstream Shannon config semantics (apps/worker/configs/example-config.yaml).
+# String flags use "true"/"false" quoted strings, same as upstream.
+# The interactive pre-flight scope confirmation remains the default;
+# a config file supplements it (config wins on conflicts).
+
+description: "Target app and environment context (optional, max 500 chars)"
+
+# Every scan runs all five upstream classes (injection, xss, auth, authz, ssrf)
+# plus the native misc lane. There is no setting to narrow that (same as upstream,
+# whose example says "all five"; misc is a native-only extension).
+
+# Upstream-only: agentic_sast (native runs SAST-lite instead; this block is
+# accepted and ignored, except a failed SAST-lite marks the scan partial).
+# agentic_sast:
+#   enabled: "false"
+
+# Skip the exploitation phase (optional, default: "true").
+# "false" = analysis-only mode: no live payloads, safe for production-like targets.
+# exploit: "false"
+
+# Free-form engagement rules applied to analysis and exploitation agents (optional).
+# rules_of_engagement: |
+#   Forbidden techniques:
+#   - No password brute-force or credential stuffing. Cap login attempts at 5 per account.
+#   Operational:
+#   - Throttle to under 5 requests per second per endpoint. Back off 60 seconds on any 429.
+#   Data handling:
+#   - Do not include actual secret values in deliverables, use placeholders like [order_id].
+
+authentication:
+  login_type: form  # Native supports 'form' and 'sso' (upstream schema also allows 'api', 'basic')
+  login_url: "https://example.com/login"
+  credentials:
+    username: "testuser"
+    password: "testpassword"
+    totp_secret: "JBSWY3DPEHPK3PXP"  # Optional TOTP secret for 2FA
+    # Optional mailbox credentials for magic-link / email-OTP flows.
+    # email_login:
+    #   address: "inbox@example.com"
+    #   password: "mailbox-password"
+    #   totp_secret: "JBSWY3DPEHPK3PXP"
+  # Natural language login flow. Placeholders: $username $password $totp
+  # $email_address $email_password $email_totp
+  login_flow:
+    - "Type $username into the email field"
+    - "Type $password into the password field"
+    - "Click the 'Sign In' button"
+    - "Enter $totp in the verification code field"
+    - "Click 'Verify'"
+  success_condition:
+    type: url_contains  # Options: url_contains, url_equals_exactly, element_present, text_contains
+    value: "/dashboard"
+
+rules:
+  # Supported types: url_path, subdomain, domain, method, header, parameter, code_path
+  # code_path values are repo-relative file paths or globs (e.g. "src/auth.ts").
+  avoid:
+    - description: "Skip logout functionality"
+      type: url_path
+      value: "/logout"
+    - description: "No DELETE operations on user API"
+      type: url_path
+      value: "/api/v1/users/*"
+    # - description: "Test fixtures and specs (not production code)"
+    #   type: code_path
+    #   value: "test/**"
+  focus:
+    - description: "Focus on user profile updates"
+      type: url_path
+      value: "/api/v2/user-profile"
+
+report:
+  # Minimum severity included in the final report (low, medium, high, critical).
+  min_severity: "low"
+  # Minimum confidence, applies in analysis-only mode (low, medium, high).
+  min_confidence: "low"
+  # SARIF output on/off (string flag, default "true" for exploit runs).
+  sarif: "true"
+  # Free-text report guidance, e.g. audience or sections to emphasize.
+  # guidance: "Executive audience, emphasize remediation priority."

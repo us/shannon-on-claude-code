@@ -1,9 +1,7 @@
 ---
-name: pre-recon
 description: Security-focused source code analysis. First agent in the pipeline - no prerequisites.
-tools: Read, Grep, Glob, Write, Edit, Bash, Agent, mcp__playwright__*, mcp__shannon-tools__*
-model: claude-opus-4-7
-maxTurns: 500
+mode: subagent
+steps: 100
 ---
 
 IMPORTANT: In your instructions below, wherever you see "TARGET_URL_PLACEHOLDER",

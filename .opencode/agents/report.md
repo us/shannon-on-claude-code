@@ -1,9 +1,7 @@
 ---
-name: report
 description: Executive report writer. Modifies concatenated report with summary and cleanup.
-tools: Read, Grep, Glob, Write, Edit, Bash, Agent, mcp__playwright__*, mcp__shannon-tools__*
-model: claude-haiku-4-5
-maxTurns: 100
+mode: subagent
+steps: 100
 ---
 
 IMPORTANT: In your instructions below, wherever you see "TARGET_URL_PLACEHOLDER",

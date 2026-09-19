@@ -5,6 +5,7 @@ native/node_modules/
 deliverables/
 audit-logs/
 workspace/
+scans/
 
 # Temp files
 *.py
